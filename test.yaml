@@ -1,0 +1,19 @@
+apiVersion: v1
+platform: aws
+spec:
+  config:
+      useLocalConfig: true
+      region: us-east-2
+  resource:
+      type: lambda
+  action: create
+  spec:
+    s3Bucket: phirmware-lambda-test
+    s3Key: function.zip
+    description: simple api deployed with CLI
+    functionName: simple-deploy
+    handler: index.handler
+    runtime: nodejs12.x
+    role: arn:aws:iam::937105331058:role/phirmware-lambda
+    
+  
