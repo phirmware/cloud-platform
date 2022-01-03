@@ -1,12 +1,12 @@
 package command
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/phirmware/cloud-platform/aws"
+	flag "github.com/spf13/pflag"
 )
 
 func init() {

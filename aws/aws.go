@@ -1,7 +1,9 @@
 package aws
 
 import (
+	"io"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/phirmware/cloud-platform/aws/lambdas"
@@ -21,15 +23,19 @@ var executeLambda = lambdas.Execute
 func Execute(file string, cmd string) {
 	switch cmd {
 	case "apply":
-		Apply(file, os.Open)
+		Apply(file, os.Open, ioutil.ReadAll)
 	}
 }
 
-func Apply(file string, open func(string) (*os.File, error)) {
+func Apply(file string, open func(string) (*os.File, error), reader func(io.Reader) ([]byte, error)) {
 	var def Definition
-	f, _ := open(file)
+	f, err := open(file)
+	if err != nil {
+		log.Fatalf("FATAL: failed to load file: %v", err)
+	}
+
 	defer f.Close()
-	yaml.ParseYamlDefinition(f, &def, ioutil.ReadAll)
+	yaml.ParseYamlDefinition(f, &def, reader)
 
 	switch def.Spec.Resource.Type {
 	case "lambda":
