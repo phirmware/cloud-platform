@@ -19,15 +19,36 @@ type Definition struct {
 }
 
 var executeLambda = lambdas.Execute
+var deleteLambda = lambdas.Delete
 
 func Execute(file string, cmd string) {
 	switch cmd {
 	case "apply":
 		Apply(file, os.Open, ioutil.ReadAll)
+	case "delete":
+		Delete(file, os.Open, ioutil.ReadAll)
 	}
 }
 
 func Apply(file string, open func(string) (*os.File, error), reader func(io.Reader) ([]byte, error)) {
+	resourceType := getDefinitionResourceType(file, open, reader)
+
+	switch resourceType {
+	case "lambda":
+		executeLambda(file)
+	}
+}
+
+func Delete(file string, open func(string) (*os.File, error), reader func(io.Reader) ([]byte, error)) {
+	resourceType := getDefinitionResourceType(file, open, reader)
+
+	switch resourceType {
+	case "lambda":
+		deleteLambda(file)
+	}
+}
+
+func getDefinitionResourceType(file string, open func(string) (*os.File, error), reader func(io.Reader) ([]byte, error)) string {
 	var def Definition
 	f, err := open(file)
 	if err != nil {
@@ -37,8 +58,5 @@ func Apply(file string, open func(string) (*os.File, error), reader func(io.Read
 	defer f.Close()
 	yaml.ParseYamlDefinition(f, &def, reader)
 
-	switch def.Spec.Resource.Type {
-	case "lambda":
-		executeLambda(file)
-	}
+	return def.Spec.Resource.Type
 }

@@ -8,7 +8,7 @@ spec:
       type: lambda
       spec:
         description: simple api deployed with CLI
-        functionName: simple-deploys
+        functionName: simple-deploy-test
         handler: index.handler
         runtime: nodejs12.x
         role: arn:aws:iam::937105331058:role/phirmware-lambda
