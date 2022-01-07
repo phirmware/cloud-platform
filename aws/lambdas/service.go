@@ -139,3 +139,22 @@ func createLambdaFunction(l *Lambdas, def Definition, logger func(v ...interface
 	}
 	log.Println(result)
 }
+
+func Delete(file string) {
+	var def Definition
+
+	f, _ := os.Open(file)
+	defer f.Close()
+
+	yaml.ParseYamlDefinition(f, &def, ioutil.ReadAll)
+
+	config := def.Spec.Config
+	l := NewLambdas(FunctionsConfig{UseLocalConfig: config.UseLocalConfig, Region: config.Region})
+
+	_, err := l.DeleteFunction(def.Spec.Resource.Spec.FunctionName)
+	if err != nil {
+		log.Fatalf("Could not delete lambda funciton: Error: %s", err)
+	}
+
+	log.Println("Done")
+}
